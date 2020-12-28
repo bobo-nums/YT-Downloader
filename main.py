@@ -2,10 +2,16 @@
 YouTube Downloader in Python
 Based on tutorial video by NeuralNine
 https://www.youtube.com/watch?v=UM6YDJ2aalU
+
+Make sure ffmpeg is installed
+https://www.ffmpeg.org/
+
+Make sure ffmpeg.exe is in script directory
 """
 
 import pytube
 import os
+import subprocess
 
 # url = ''
 # for stream in pytube.YouTube(url).streams.filter(progressive=True):
@@ -38,9 +44,13 @@ for x, video in enumerate(video_list):
         else:
             print("720p 30fps available")
     
+    title = input("Enter title: ")
     print(f"Downloading " + msg + " #" + str(x + 1) + "...")
-    output = os.getcwd() +  "/Downloads"
-    stream.download(filename=v.title, output_path=output)
+    output = os.getcwd() + "\Downloads"
+    stream.download(filename=title, output_path=output)
+    if audio_or_video == 'A':
+        cmd = [r'ffmpeg','-i', os.path.join(output, title + ".mp4"), os.path.join(output, title + ".mp3")]
+        subprocess.run(cmd, shell=True, stdout=subprocess.DEVNULL, stderr=subprocess.STDOUT) # DEVNULL suppresses terminal output
     print("Done")
 
 print("======================\nAll downloaded!")
