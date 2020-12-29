@@ -13,7 +13,6 @@ import pytube
 from pytube import Playlist
 import os
 import subprocess
-import re
 
 # ----------------- Stream testing ----------------- 
 # url = ''
