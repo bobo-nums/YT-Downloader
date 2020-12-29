@@ -12,22 +12,36 @@ Make sure ffmpeg.exe is in script directory
 import pytube
 import os
 import subprocess
+import re
 
 # url = ''
 # for stream in pytube.YouTube(url).streams.filter(progressive=True):
 #     print(stream)
 
 video_list = []
+success = []
+fail = []
 
-print("YouTube Downloader\n======================")
+print("======================\nYouTube Downloader\n======================")
 audio_or_video = input("[A]udio or [V]ideo: ")
-print("Enter URLs (Terminate by 'STOP')")
+video_or_playlist = input("[V]ideo or [P]laylist: ")
 
-while True:
-    url = input("")
-    if url == 'stop' or url == 'STOP':
-        break
-    video_list.append(url)
+if video_or_playlist == "V":    # download indiviudal video(s)
+    print("Enter URLs (Terminate by 'STOP')")
+
+    while True:
+        url = input("")
+        if url == 'stop' or url == 'STOP':
+            break
+        video_list.append(url)
+
+# else:                           # download entire playlist
+#     playlist_url = input("Enter playlist URL: ")
+#     playlist = pytube.Playlist(playlist_url)
+#     playlist._video_regex = re.compile(r"\"url\":\"(/watch\?v=[\w-]*)")
+#     print("test")
+#     for url in playlist.video_urls:
+#         print(url)
 
 for x, video in enumerate(video_list):
     v = pytube.YouTube(video)
@@ -44,13 +58,36 @@ for x, video in enumerate(video_list):
         else:
             print("720p 30fps available")
     
-    title = input("Enter title: ")
+    title = v.title
     print(f"Downloading " + msg + " #" + str(x + 1) + "...")
     output = os.getcwd() + "\Downloads"
     stream.download(filename=title, output_path=output)
     if audio_or_video == 'A':
-        cmd = [r'ffmpeg','-i', os.path.join(output, title + ".mp4"), os.path.join(output, title + ".mp3")]
-        subprocess.run(cmd, shell=True, stdout=subprocess.DEVNULL, stderr=subprocess.STDOUT) # DEVNULL suppresses terminal output
+        print(f"Converting " + msg + " #" + str(x + 1) + "...")
+        try:
+            try:
+                os.remove(os.path.join(output, title + ".mp3")) # removes old mp3 file if exists
+                print("Removing old mp3 file...")
+            finally:
+                cmd = [r'ffmpeg','-i', os.path.join(output, title + ".mp4"), os.path.join(output, title + ".mp3")]
+                # subprocess.run(cmd, shell=True)
+                subprocess.run(cmd, shell=True, stdout=subprocess.DEVNULL, stderr=subprocess.STDOUT) # additional args suppresses terminal output
+                os.remove(os.path.join(output, title + ".mp4")) # removes old mp4 file
+                success.append(title)
+        except:
+            print(f"Converting " + msg + " #" + str(x + 1) + " failed!")
+            fail.append(title)
+    else:
+        success.append(title)
     print("Done")
 
-print("======================\nAll downloaded!")
+print("======================\nFinished!")
+
+print("Successes: ")
+for i in success:
+    print("     " + i)
+
+print("Failures: ")
+for i in fail:
+    print("     " + i)
+print("======================\n")
