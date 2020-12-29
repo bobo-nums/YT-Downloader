@@ -68,7 +68,7 @@ for x, video in enumerate(video_list):
         else:
             print("720p 30fps available")
     
-    title = input("Enter video title: ")
+    title = input("Enter title: ")
     # title = v.title
     print(f"Downloading " + msg + " #" + str(x + 1) + "...")
     output = os.getcwd() + "\Downloads"
