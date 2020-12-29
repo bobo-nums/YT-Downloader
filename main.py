@@ -10,13 +10,24 @@ Make sure ffmpeg.exe is in script directory
 """
 
 import pytube
+from pytube import Playlist
 import os
 import subprocess
 import re
 
+# ----------------- Stream testing ----------------- 
 # url = ''
 # for stream in pytube.YouTube(url).streams.filter(progressive=True):
 #     print(stream)
+
+# ----------------- Playlist testing ----------------- 
+# p = Playlist("https://www.youtube.com/playlist?list=PLS1QulWo1RIaJECMeUT4LFwJ-ghgoSH6n")
+# print(f'Downloading: {p.title}')
+# output = os.getcwd() + "\Downloads"
+# for video in p.videos:
+#     video.streams.first().download(output_path=output)
+
+# ----------------- Youtube downloader ----------------- 
 
 video_list = []
 success = []
