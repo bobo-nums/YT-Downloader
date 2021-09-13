@@ -45,13 +45,14 @@ if video_or_playlist == "V":    # download indiviudal video(s)
             break
         video_list.append(url)
 
-# else:                           # download entire playlist
-#     playlist_url = input("Enter playlist URL: ")
-#     playlist = pytube.Playlist(playlist_url)
-#     playlist._video_regex = re.compile(r"\"url\":\"(/watch\?v=[\w-]*)")
-#     print("test")
-#     for url in playlist.video_urls:
-#         print(url)
+else:                           # download entire playlist
+    playlist_url = input("Enter playlist URL: ")
+    playlist = pytube.Playlist(playlist_url)
+    # playlist._video_regex = re.compile(r"\"url\":\"(/watch\?v=[\w-]*)")
+    # print("test")
+    for url in playlist.video_urls:
+        print(url)
+        video_list.append(url)
 
 for x, video in enumerate(video_list):
     v = pytube.YouTube(video)
@@ -70,6 +71,8 @@ for x, video in enumerate(video_list):
     
     title = input("Enter title: ")
     # title = v.title
+    # title = str(x + 1)
+    title += (".mp3")
     print(f"Downloading " + msg + " #" + str(x + 1) + "...")
     output = os.getcwd() + "\Downloads"
     stream.download(filename=title, output_path=output)
