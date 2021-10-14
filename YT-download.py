@@ -35,11 +35,10 @@ if video_or_playlist == "V":
             break
         try:
             v = pytube.YouTube(url)
-        except:
-            print("Not a valid URL, ignoring")
-        else:
             print("Title: " + v.title)
             video_list.append(url)
+        except:
+            print("Not a valid URL, ignoring")
 
 # download entire playlist
 else:
@@ -51,11 +50,10 @@ else:
             for x, url in enumerate(playlist.video_urls):
                 try:
                     v = pytube.YouTube(url)
-                except:
-                    print("Video unavailable (" + url + ")")
-                else:
                     print(str(x) + " | " + url + " | " + v.title)
                     video_list.append(url)
+                except:
+                    print("Video unavailable (" + url + ")")
             break
         except:
             print("Not a valid playlist URL, try again (is it private?)")
