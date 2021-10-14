@@ -35,10 +35,11 @@ if video_or_playlist == "V":
             break
         try:
             v = pytube.YouTube(url)
-            print("Title: " + v.title)
-            video_list.append(url)
         except:
             print("Not a valid URL, ignoring")
+        else:
+            print("Title: " + v.title)
+            video_list.append(url)
 
 # download entire playlist
 else:
@@ -79,7 +80,10 @@ for x, video in enumerate(video_list):
         title += ".mp3"
     else:
         title += ".mp4"
-    stream.download(filename=title, output_path=output)
+    try:
+        stream.download(filename=title, output_path=output)
+    except:
+        print("Unable to download")
     print("Done")
 
 print("======================\nFinished!")
