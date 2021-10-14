@@ -3,33 +3,14 @@ YouTube Downloader in Python
 Based on tutorial video by NeuralNine
 https://www.youtube.com/watch?v=UM6YDJ2aalU
 
-Make sure ffmpeg is installed
-https://www.ffmpeg.org/
-
-Make sure ffmpeg.exe is in script directory
 """
 
 import pytube
 import os
-import subprocess
-
-# ----------------- Stream testing ----------------- 
-# url = ''
-# for stream in pytube.YouTube(url).streams.filter(progressive=True):
-#     print(stream)
-
-# ----------------- Playlist testing ----------------- 
-# p = Playlist("https://www.youtube.com/playlist?list=PLS1QulWo1RIaJECMeUT4LFwJ-ghgoSH6n")
-# print(f'Downloading: {p.title}')
-# output = os.getcwd() + "\Downloads"
-# for video in p.videos:
-#     video.streams.first().download(output_path=output)
 
 # ----------------- Youtube downloader ----------------- 
-
 video_list = []
-success = []
-fail = []
+itags = [37, 22, 18] # 1080p, 720p, 360p audio/video tracks together
 
 print("======================\nYouTube Downloader\n======================")
 
@@ -54,85 +35,51 @@ if video_or_playlist == "V":
             break
         try:
             v = pytube.YouTube(url)
-            print(v.title)
+            print("Title: " + v.title)
             video_list.append(url)
         except:
             print("Not a valid URL, ignoring")
-        
 
 # download entire playlist
-elif video_or_playlist == "P":
+else:
     playlist_url = input("Enter playlist URL: ")
     while True:
         playlist = pytube.Playlist(playlist_url)
         try:
             print("Playlist title: " + playlist.title)
-            for url in playlist.video_urls:
+            for x, url in enumerate(playlist.video_urls):
                 try:
                     v = pytube.YouTube(url)
                 except:
                     print("Video unavailable (" + url + ")")
                 else:
-                    print(url + " | " + v.title)
+                    print(str(x) + " | " + url + " | " + v.title)
                     video_list.append(url)
             break
         except:
             print("Not a valid playlist URL, try again (is it private?)")
             playlist_url = input("Enter playlist URL: ")
-else:
-    print("How did you even get here?") # should never get here
-    quit()
 
-# for x, video in enumerate(video_list):
-#     v = pytube.YouTube(video)
-#     if audio_or_video == 'A':
-#         msg = 'audio'
-#         stream = v.streams.get_audio_only()
+# download, remove non-filename friendly chars, and append proper format
+for x, video in enumerate(video_list):
+    v = pytube.YouTube(video)
+    if audio_or_video == 'A':
+        msg = 'audio'
+        stream = v.streams.get_audio_only()
+    else:
+        msg = 'video'
+        for itag in itags:
+            stream = v.streams.get_by_itag(itag)
+            if stream != None:
+                break
+    title = "".join(x for x in v.title if (x.isalnum() or x in "._- ()"))
+    print("Downloading " + msg + " #" + str(x + 1) + " | " + v.title)
+    output = os.getcwd() + "\Downloads"
+    if audio_or_video == 'A':
+        title += ".mp3"
+    else:
+        title += ".mp4"
+    stream.download(filename=title, output_path=output)
+    print("Done")
 
-#     else:
-#         msg = 'video'
-#         stream = v.streams.get_by_itag(22)
-#         if stream == None:
-#             print("720p 30fps not available, trying 360p 30fps")
-#             stream = v.streams.get_by_itag(18)
-#         else:
-#             print("720p 30fps available")
-    
-#     # title = input("Enter title: ")
-#     title = v.title
-#     title = str(x + 1)
-#     title += (".mp3")
-#     print(f"Downloading " + msg + " #" + str(x + 1) + "...")
-#     output = os.getcwd() + "\Downloads"
-#     stream.download(filename=title, output_path=output)
-#     if audio_or_video == 'A':
-#         print(f"Converting " + msg + " #" + str(x + 1) + "...")
-#         try:
-#             try:
-#                 os.remove(os.path.join(output, title + ".mp3")) # removes old mp3 file if exists
-#                 print("Removing old mp3 file...")
-#             except:
-#                 print("No previously existing mp3 file...")
-#             finally:
-#                 cmd = [r'ffmpeg','-i', os.path.join(output, title + ".mp4"), os.path.join(output, title + ".mp3")]
-#                 # subprocess.run(cmd, shell=True)
-#                 subprocess.run(cmd, shell=True, stdout=subprocess.DEVNULL, stderr=subprocess.STDOUT) # additional args suppresses terminal output
-#                 os.remove(os.path.join(output, title + ".mp4")) # removes old mp4 file
-#                 success.append(title)
-#         except:
-#             print(f"Converting " + msg + " #" + str(x + 1) + " failed!")
-#             fail.append(title)
-#     else:
-#         success.append(title)
-#     print("Done")
-
-# print("======================\nFinished!")
-
-# print("Successes: ")
-# for i in success:
-#     print("     " + i)
-
-# print("Failures: ")
-# for i in fail:
-#     print("     " + i)
-# print("======================\n")
+print("======================\nFinished!")
